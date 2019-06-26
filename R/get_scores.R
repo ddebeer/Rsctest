@@ -100,13 +100,13 @@ get_scores_from_terms <- function(resp, terms){
 
 # function to scale/decorelate the scores (per impactGroup)
 scale_scores <- function(scores, meanCenter = TRUE, decorrelate = TRUE,
-                         impactGroups = rep(1, dim(scores)[1])){
+                         impact_groups = rep(1, dim(scores)[1])){
 
   # create return object
   process <- scores
 
-  for(groupInd in unique(impactGroups)){
-    which <- impactGroups == groupInd
+  for(groupIndicator in unique(impact_groups)){
+    which <- impact_groups == groupIndicator
 
     if(decorrelate){
       # Center scores

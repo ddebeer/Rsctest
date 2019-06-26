@@ -1,13 +1,54 @@
-# function to perform a score test based on the bootstrap idea:
-# - the real scores contributions + test statistic is computed
-# - a number of boostrap samples is generated (i.e., response matrixes) using
-# the item parameters and the person parameters that were used to compute the
-# true score contributions.
-# Using every generated response matrix (i.e., for every bootstrap), the score
-# contributions as well as the test statistic are computed.
-# the p-value(s) are obtained by comparing the true test statistica with the
-# distribution of boostrap-based test statistics.
-
+#' Perform a score-based DIF test using the permutation approach.
+#'
+#' \code{permutation_sctest} computes score test to detect DIF in multiple
+#' item/parameters with respect to multiple person covariates (\code{order_by}).
+#' To obtain the p-values a resampling approach is applied. That is, person
+#' orders are randomly permuted to sample from the test statistic distribution
+#' under the null hypothesis. The
+#' functionality is limited to the 1-, 2-, and 3-parameter logistic models.
+#' Only DIF with respect to the \code{a} and \code{b} parameters are tested for,
+#' respectively the item discriminations and the item difficulties.
+#'
+#' @param resp A matrix (or data frame) containing the responses, with the
+#' items in the columns.
+#' @param theta A vector with the true/estimated ability parameters or NULL
+#' (the default) which leads to the ability parameters being estimated.
+#' @param a A vector of item slopes/item discriminations.
+#' @param b A vector of item locations/item difficulties.
+#' @param c A vector of pseudo guessing parameters.
+#' @param order_by A list with the person covariate(s) to test for as
+#' element(s).
+#' @param parameters A charachter string, either "per_item", "ab", "a", or "b",
+#' to specify which parameters should be tested for.
+#' @param itemNrs A integer vector with the colum numbers in the \code(resp),
+#' specifying the items for which the test should be computed. Or NULL (the
+#' default), which leads to all the items being tested.
+#' @param nSamples An integer value with the number of permutations to be
+#' sampled.
+#' @param theta_method A charachter string, either "wle", "mle", "eap", of
+#' "map" that specifies the estimator for the ability estimation. Only
+#' relevant when \code(theta == NULL).
+#' @param slope_intercept A logical value indicating whether the slope-intercept
+#' formulation of the 2-/3-PL model should be used.
+#' @param type A charachter string, either "auto", "doubleMax", "meanL2",
+#' or "maxL2", specifying the test statistic to be used.
+#' @param meanCenter A logical value: should the score contributions be mean
+#' centered per parameter?
+#' @param decorrelate A logical value: should the score contributions be
+#' decorrelated?
+#' @param impact_groups A vector indicating impact-group membership for
+#' each person.
+#' @return a list with four elements:
+#' \describe{
+#'   \item{\code{test_stats}}{A matrix containing all the test statistics.}
+#'   \item{\code{p}}{A matrix containing the obtained \emph{p}-values.}
+#'   \item{\code{nSamples}}{The number of samples taken.}
+#'   \item{\code{order_by}}{A list containing all the covariate(s) used to order
+#'    the score contirbutions.}
+#' }
+#' @aliases bootstrap_sctest
+#'
+#' @export
 permutation_sctest <- function(resp,
                                theta = NULL,
                                a = rep(1, length(b)),
@@ -16,14 +57,13 @@ permutation_sctest <- function(resp,
                                order_by = NULL,
                                parameters = c("per_item", "ab", "a", "b"),
                                itemNrs = NULL,
-                               nPerms = 1000,
+                               nSamples = 1000,
                                theta_method = c("wle", "mle", "eap", "map"),
                                slope_intercept = FALSE,
                                type = c("auto", "doubleMax", "meanL2", "maxL2"),
                                meanCenter = TRUE,
                                decorrelate = TRUE,
-                               impactGroups = rep(1, dim(resp)[1]),
-                               sparse = FALSE){
+                               impact_groups = rep(1, dim(resp)[1])){
 
 
   # The response should be in a matrix
@@ -90,17 +130,17 @@ of score contributions")
 
   # get the scores, as well as the terms to compute the scores
   scores_terms <- get_scores(resp, a, b, c, theta,
-                             slope_intercept, sparse,
+                             slope_intercept, sparse = FALSE,
                              return_terms = TRUE)
 
   # scale generated score contributions, so that they become brownian process
-  process <- scale_scores(scores_terms$scores, meanCenter, decorrelate, impactGroups)
+  process <- scale_scores(scores_terms$scores, meanCenter, decorrelate, impact_groups)
 
   # compute the test statistic based on the observed scores
   test_stats <- get_stats(process, index, which_col, type)
 
   # get test statistic distribution based on the permutations
-  permuted_stats <- get_permuted_stats(process, which_col, type, nPerms)
+  permuted_stats <- get_permuted_stats(process, which_col, type, nSamples)
 
   # compute the p-values
   p <- get_pvalues(test_stats, permuted_stats)
@@ -108,7 +148,7 @@ of score contributions")
 
   return(list(test_stats = test_stats,
               p = p,
-              nPerms = nPerms,
+              nSamples = nSamples,
               order_by = order_by))
 
 
@@ -116,15 +156,15 @@ of score contributions")
 
 
 # function to compute the bootstrapped statistics
-get_permuted_stats <- function(process, which_col, type, nPerms){
+get_permuted_stats <- function(process, which_col, type, nSamples){
 
-  sapply(seq_len(nPerms), get_one_permuted_stat, simplify = "array",
+  sapply(seq_len(nSamples), get_one_permuted_stat, simplify = "array",
          process, which_col, type)
 }
 
 
 # function to compute one bootstrapped statistic
-get_one_permuted_stat <- function(permNr, process, which_col, type){
+get_one_permuted_stat <- function(sampleNr, process, which_col, type){
 
   nPerson <- 'if'(is.null(dim(process)), length(process), dim(process)[1])
 
