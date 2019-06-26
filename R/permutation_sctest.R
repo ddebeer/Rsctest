@@ -19,7 +19,7 @@
 #'   \item{\code{order_by}}{A list containing all the covariate(s) used to order
 #'    the score contirbutions.}
 #' }
-#' @aliases bootstrap_sctest
+#' @aliases permutation_sctest
 #' @seealso \code{\link{bootstrap_sctest}}
 #'
 #' @export

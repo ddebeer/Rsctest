@@ -1,6 +1,6 @@
 #' A score-based DIF test using the parameteric bootstrap approach.
 #'
-#' \code{boostrap_sctest} computes score test to detect DIF in multiple
+#' \code{bootstrap_sctest} computes score test to detect DIF in multiple
 #' item/parameters with respect to multiple person covariates (\code{order_by}).
 #' To obtain the p-values a resampling approach is applied. That is, given the
 #' (item and person) parameters, new data sets are sampled to create the

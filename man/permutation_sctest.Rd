@@ -2,7 +2,6 @@
 % Please edit documentation in R/permutation_sctest.R
 \name{permutation_sctest}
 \alias{permutation_sctest}
-\alias{bootstrap_sctest}
 \title{A score-based DIF test using the permutation approach.}
 \usage{
 permutation_sctest(resp, theta = NULL, a = rep(1, length(b)), b,
