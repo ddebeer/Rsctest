@@ -2,7 +2,6 @@
 % Please edit documentation in R/bootstrap_sctest.R
 \name{bootstrap_sctest}
 \alias{bootstrap_sctest}
-\alias{permutation_sctest}
 \title{A score-based DIF test using the parameteric bootstrap approach.}
 \usage{
 bootstrap_sctest(resp, theta = NULL, a = rep(1, length(b)), b,
