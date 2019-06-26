@@ -1,0 +1,19 @@
+Package: Rsctest
+Type: Package
+Title: Resampling Score-Based Test for DIF-Detection
+Version: 0.1.0
+Authors@R: c(
+    person("Dries", "Debeer", email = "debeer.dries@gmail.com", role = "cre"),
+    person("Rudolf", "Debelak", email = "rudolf.debelak@psychologie.uzh.ch", 
+    role = "ctb"))
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: More about what it does (maybe more than one line)UZH
+    Use four spaces when indenting paragraphs within the Description.
+Imports: 
+    expm,
+    Matrix,
+    PP
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
