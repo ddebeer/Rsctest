@@ -6,9 +6,11 @@ Authors@R: c(
     person("Dries", "Debeer", email = "debeer.dries@gmail.com", role = "cre"),
     person("Rudolf", "Debelak", email = "rudolf.debelak@psychologie.uzh.ch", 
     role = "ctb"))
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)UZH
-    Use four spaces when indenting paragraphs within the Description.
+Description: This R-package includes two approaches to perform a score-test for
+    DIF detection based on resampling techniques, and is focused on data from 
+    Multi-Stage Adaptive Tests. Currently the functionality is limited to the 
+    1-, 2-, and 3-PL models. Only the DIF in the threshold (b) and 
+    slope (a) parameter are tested for. 
 Imports: 
     expm,
     Matrix,
