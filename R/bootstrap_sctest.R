@@ -1,6 +1,6 @@
-#' Perform a score-based DIF test using the parameteric bootstrap approach.
+#' A score-based DIF test using the parameteric bootstrap approach.
 #'
-#' \code{permutation_sctest} computes score test to detect DIF in multiple
+#' \code{boostrap_sctest} computes score test to detect DIF in multiple
 #' item/parameters with respect to multiple person covariates (\code{order_by}).
 #' To obtain the p-values a resampling approach is applied. That is, given the
 #' (item and person) parameters, new data sets are sampled to create the
@@ -20,14 +20,14 @@
 #' element(s).
 #' @param parameters A charachter string, either "per_item", "ab", "a", or "b",
 #' to specify which parameters should be tested for.
-#' @param itemNrs A integer vector with the colum numbers in the \code(resp),
+#' @param itemNrs An integer vector with the colum numbers in the \code{resp},
 #' specifying the items for which the test should be computed. Or NULL (the
 #' default), which leads to all the items being tested.
 #' @param nSamples An integer value with the number of permutations to be
 #' sampled.
 #' @param theta_method A charachter string, either "wle", "mle", "eap", of
 #' "map" that specifies the estimator for the ability estimation. Only
-#' relevant when \code(theta == NULL).
+#' relevant when \code{theta == NULL}.
 #' @param slope_intercept A logical value indicating whether the slope-intercept
 #' formulation of the 2-/3-PL model should be used.
 #' @param type A charachter string, either "auto", "doubleMax", "meanL2",
@@ -47,6 +47,7 @@
 #'    the score contirbutions.}
 #' }
 #' @aliases permutation_sctest
+#' @seealso \code{\link{permutation_sctest}}
 #'
 #' @export
 bootstrap_sctest <- function(resp,

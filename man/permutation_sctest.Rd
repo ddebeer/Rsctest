@@ -3,7 +3,7 @@
 \name{permutation_sctest}
 \alias{permutation_sctest}
 \alias{bootstrap_sctest}
-\title{Perform a score-based DIF test using the permutation approach.}
+\title{A score-based DIF test using the permutation approach.}
 \usage{
 permutation_sctest(resp, theta = NULL, a = rep(1, length(b)), b,
   c = rep(0, length(b)), order_by = NULL, parameters = c("per_item",
@@ -32,7 +32,7 @@ element(s).}
 \item{parameters}{A charachter string, either "per_item", "ab", "a", or "b",
 to specify which parameters should be tested for.}
 
-\item{itemNrs}{A integer vector with the colum numbers in the \code(resp),
+\item{itemNrs}{An integer vector with the colum numbers in the \code{resp},
 specifying the items for which the test should be computed. Or NULL (the
 default), which leads to all the items being tested.}
 
@@ -41,7 +41,7 @@ sampled.}
 
 \item{theta_method}{A charachter string, either "wle", "mle", "eap", of
 "map" that specifies the estimator for the ability estimation. Only
-relevant when \code(theta == NULL).}
+relevant when \code{theta == NULL}.}
 
 \item{slope_intercept}{A logical value indicating whether the slope-intercept
 formulation of the 2-/3-PL model should be used.}
@@ -77,4 +77,7 @@ under the null hypothesis. The
 functionality is limited to the 1-, 2-, and 3-parameter logistic models.
 Only DIF with respect to the \code{a} and \code{b} parameters are tested for,
 respectively the item discriminations and the item difficulties.
+}
+\seealso{
+\code{\link{bootstrap_sctest}}
 }

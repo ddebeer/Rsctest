@@ -1,4 +1,4 @@
-#' Perform a score-based DIF test using the permutation approach.
+#' A score-based DIF test using the permutation approach.
 #'
 #' \code{permutation_sctest} computes score test to detect DIF in multiple
 #' item/parameters with respect to multiple person covariates (\code{order_by}).
@@ -9,35 +9,8 @@
 #' Only DIF with respect to the \code{a} and \code{b} parameters are tested for,
 #' respectively the item discriminations and the item difficulties.
 #'
-#' @param resp A matrix (or data frame) containing the responses, with the
-#' items in the columns.
-#' @param theta A vector with the true/estimated ability parameters or NULL
-#' (the default) which leads to the ability parameters being estimated.
-#' @param a A vector of item slopes/item discriminations.
-#' @param b A vector of item locations/item difficulties.
-#' @param c A vector of pseudo guessing parameters.
-#' @param order_by A list with the person covariate(s) to test for as
-#' element(s).
-#' @param parameters A charachter string, either "per_item", "ab", "a", or "b",
-#' to specify which parameters should be tested for.
-#' @param itemNrs A integer vector with the colum numbers in the \code(resp),
-#' specifying the items for which the test should be computed. Or NULL (the
-#' default), which leads to all the items being tested.
-#' @param nSamples An integer value with the number of permutations to be
-#' sampled.
-#' @param theta_method A charachter string, either "wle", "mle", "eap", of
-#' "map" that specifies the estimator for the ability estimation. Only
-#' relevant when \code(theta == NULL).
-#' @param slope_intercept A logical value indicating whether the slope-intercept
-#' formulation of the 2-/3-PL model should be used.
-#' @param type A charachter string, either "auto", "doubleMax", "meanL2",
-#' or "maxL2", specifying the test statistic to be used.
-#' @param meanCenter A logical value: should the score contributions be mean
-#' centered per parameter?
-#' @param decorrelate A logical value: should the score contributions be
-#' decorrelated?
-#' @param impact_groups A vector indicating impact-group membership for
-#' each person.
+#' @inheritParams bootstrap_sctest
+#'
 #' @return a list with four elements:
 #' \describe{
 #'   \item{\code{test_stats}}{A matrix containing all the test statistics.}
@@ -47,6 +20,7 @@
 #'    the score contirbutions.}
 #' }
 #' @aliases bootstrap_sctest
+#' @seealso \code{\link{bootstrap_sctest}}
 #'
 #' @export
 permutation_sctest <- function(resp,
