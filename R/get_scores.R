@@ -116,7 +116,12 @@ scale_scores <- function(scores, meanCenter = TRUE, decorrelate = TRUE,
       process[which, ][is.na(process[which, ])] <- 0
 
       # Decorelate process
-      sqrtInvI <- chol2inv(chol(expm::sqrtm(crossprod(process[which, ]))))
+      sqrtInvI <- tryCatch(
+        chol2inv(chol(expm::sqrtm(crossprod(process[which, ])))),
+        error = stop("Decorrelating leads to numerical problems.
+Use 'decorrelate = FALSE' instead.",
+                     call. = FALSE)
+        )
       process[which, ] <- (process[which, ] %*% sqrtInvI)
     } else {
       # Center scores

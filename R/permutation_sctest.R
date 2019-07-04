@@ -36,7 +36,7 @@ permutation_sctest <- function(resp,
                                slope_intercept = FALSE,
                                type = c("auto", "doubleMax", "meanL2", "maxL2"),
                                meanCenter = TRUE,
-                               decorrelate = TRUE,
+                               decorrelate = FALSE,
                                impact_groups = rep(1, dim(resp)[1])){
 
 

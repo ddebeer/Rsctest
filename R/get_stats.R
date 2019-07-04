@@ -33,6 +33,7 @@ get_theta <- function(resp,
     d <- rep(1, length(b))
     # check with IRT model formulation:
     if(slope_intercept){
+      print("Using the 'PP'-package to estimate the ability parameters.")
       thetaEst <- PP::PP_4pl(resp, thres = b/a, slopes = a, lowerA = c, upperA = d,
                          type = theta_method)
     } else {
@@ -95,9 +96,4 @@ get_stat <- function(process, index,
 
   return(stat)
 }
-
-
-
-
-
 

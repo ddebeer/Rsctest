@@ -63,7 +63,7 @@ bootstrap_sctest <- function(resp,
                              slope_intercept = FALSE,
                              type = c("auto", "doubleMax", "meanL2", "maxL2"),
                              meanCenter = TRUE,
-                             decorrelate = TRUE,
+                             decorrelate = FALSE,
                              impact_groups = rep(1, dim(resp)[1])){
 
 
@@ -131,7 +131,7 @@ of score contributions")
 
   # get the scores, as well as the terms to compute the scores
   scores_terms <- get_scores(resp, a, b, c, theta,
-                             slope_intercept, sparse = TRUE,
+                             slope_intercept, sparse = FALSE,
                              return_terms = TRUE)
 
   # scale generated score contributions, so that they become brownian process
@@ -141,7 +141,7 @@ of score contributions")
   test_stats <- get_stats(process, index, which_col, type)
 
   # get test statistic distribution based on
-  boostrapped_stats <- get_boostrapped_stats(observed_resp = resp,
+  bootstrapped_stats <- get_bootstrapped_stats(observed_resp = resp,
                                              terms = scores_terms$terms,
                                              meanCenter, decorrelate,
                                              impact_groups,
@@ -149,34 +149,44 @@ of score contributions")
                                              nSamples)
 
   # compute the p-values
-  p <- get_pvalues(test_stats, boostrapped_stats)
+  p <- get_pvalues(test_stats, bootstrapped_stats)
 
 
   return(list(test_stats = test_stats,
               p = p,
               nSamples = nSamples,
-              order_by = order_by))
+              order_by = order_by,
+              theta = theta))
 
 
 }
 
 
 # function to compute the bootstrapped statistics
-get_boostrapped_stats <- function(observed_resp, terms, meanCenter, decorrelate,
+get_bootstrapped_stats <- function(observed_resp, terms, meanCenter, decorrelate,
                                   impact_groups, index, which_col, type,
                                   nSamples = 1000
                                   ){
 
+  # cat("Generating bootstrapped samples:\n")
+  # progressBar <- txtProgressBar(min = 0, max = nSamples, style = 3, char = "|")
+  # env <- environment()
+
   sapply(seq_len(nSamples), get_one_bootstrapped_stat, simplify = "array",
          observed_resp, terms, meanCenter, decorrelate,
-         impact_groups, index, which_col, type)
+         impact_groups, index, which_col, type
+         #, env
+         )
 }
 
 
 # function to compute one bootstrapped statistic
 get_one_bootstrapped_stat <- function(sampleNr, observed_resp, terms, meanCenter, decorrelate,
-                                      impact_groups, index, which_col, type){
+                                      impact_groups, index, which_col, type
+                                      #, env
+                                      ){
 
+  # setTxtProgressBar(get("progressBar", env), sampleNr)
   # generate response matrix
   gen_resp <- generate_response_matrix(terms$P, observed_resp)
 
@@ -209,13 +219,13 @@ generate_response_matrix <- function(P, observed_resp){
 
 
 # function to get the p-values based on the computed test statistics and
-# the bootstrapped statistics
-get_pvalues <- function(test_stats, boostrapped_stats){
+# the bootstrapped/permuted statistics
+get_pvalues <- function(test_stats, sampled_stats){
   p <- array(NA, dim = dim(test_stats))
 
   for(orderNr in seq_len(dim(p)[1])){
     for(which_colNr in seq_len(dim(p)[2])){
-      p[orderNr, which_colNr] <- mean(boostrapped_stats[orderNr, which_colNr, ] >
+      p[orderNr, which_colNr] <- mean(sampled_stats[orderNr, which_colNr, ] >=
                                         test_stats[orderNr, which_colNr])
     }
   }
