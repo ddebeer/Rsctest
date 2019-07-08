@@ -11,11 +11,11 @@
 #'
 #' @param resp A matrix (or data frame) containing the responses, with the
 #' items in the columns.
-#' @param theta A vector with the true/estimated ability parameters or NULL
-#' (the default) which leads to the ability parameters being estimated.
 #' @param a A vector of item slopes/item discriminations.
 #' @param b A vector of item locations/item difficulties.
 #' @param c A vector of pseudo guessing parameters.
+#' @param theta A vector with the true/estimated ability parameters or NULL
+#' (the default) which leads to the ability parameters being estimated.
 #' @param order_by A list with the person covariate(s) to test for as
 #' element(s).
 #' @param parameters A charachter string, either "per_item", "ab", "a", or "b",
@@ -67,7 +67,7 @@ bootstrap_sctest <- function(resp,
                              impact_groups = rep(1, dim(resp)[1])){
 
 
-  # The response should be in a matrix
+  # The responses should be in a matrix
   stopifnot(is.matrix(resp) | is.data.frame(resp))
   if(is.data.frame(resp)) resp <- as.matrix(resp)
 
@@ -208,7 +208,7 @@ get_one_bootstrapped_stat <- function(sampleNr, observed_resp, terms, meanCenter
 generate_response_matrix <- function(P, observed_resp){
   # generate responses
   dims <- dim(observed_resp)
-  generated_resp <- (P > runif(prod(dims))) * 1
+  generated_resp <- (P > stats::runif(prod(dims))) * 1
   dim(generated_resp) <- dims
 
   # missing in real data should be missing in generated data

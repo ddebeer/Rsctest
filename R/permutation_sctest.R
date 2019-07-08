@@ -40,7 +40,7 @@ permutation_sctest <- function(resp,
                                impact_groups = rep(1, dim(resp)[1])){
 
 
-  # The response should be in a matrix
+  # The responses should be in a matrix
   stopifnot(is.matrix(resp) | is.data.frame(resp))
   if(is.data.frame(resp)) resp <- as.matrix(resp)
 

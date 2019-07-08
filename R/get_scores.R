@@ -22,7 +22,7 @@ get_scores <- function(resp, a, b, c, theta,
   nPerson <- nrow(resp)
 
   # compute terms for scores
-  terms <- get_terms_for_scores(theta, a, b, c, d, slope_intercept)
+  terms <- get_terms_for_scores(theta, a, b, c, slope_intercept)
 
   # compute scores based on responses and terms
   scores <- get_scores_from_terms(resp, terms)
@@ -39,7 +39,7 @@ get_scores <- function(resp, a, b, c, theta,
 
 
 # function to compute the terms needed for computing the score contributions
-get_terms_for_scores <- function(theta, a, b, c, d, slope_intercept){
+get_terms_for_scores <- function(theta, a, b, c, slope_intercept){
   # number of items, number of persons
   nItem <- length(b)
   nPerson <- length(theta)
@@ -91,7 +91,9 @@ get_scores_from_terms <- function(resp, terms){
 
   # Calculating and returning the scores for a and b
   scores <- cbind(score_a,
-                  score_b)
+                  score_b
+                  # , score_c
+                  )
 
   return(scores)
 

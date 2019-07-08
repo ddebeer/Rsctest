@@ -3,7 +3,8 @@ Type: Package
 Title: Resampling Score-Based Test for DIF-Detection
 Version: 0.1.0
 Authors@R: c(
-    person("Dries", "Debeer", email = "debeer.dries@gmail.com", role = "cre"),
+    person("Dries", "Debeer", email = "debeer.dries@gmail.com", 
+    role = c("cre", "aut")),
     person("Rudolf", "Debelak", email = "rudolf.debelak@psychologie.uzh.ch", 
     role = "ctb"))
 Description: This R-package includes two approaches to perform a score-test for

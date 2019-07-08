@@ -9,7 +9,7 @@ permutation_sctest(resp, theta = NULL, a = rep(1, length(b)), b,
   "ab", "a", "b"), itemNrs = NULL, nSamples = 1000,
   theta_method = c("wle", "mle", "eap", "map"),
   slope_intercept = FALSE, type = c("auto", "doubleMax", "meanL2",
-  "maxL2"), meanCenter = TRUE, decorrelate = TRUE,
+  "maxL2"), meanCenter = TRUE, decorrelate = FALSE,
   impact_groups = rep(1, dim(resp)[1]))
 }
 \arguments{
