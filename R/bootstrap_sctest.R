@@ -93,6 +93,7 @@ bootstrap_sctest <- function(resp,
 
   # select the parameters
   if(parameters == "per_item"){
+
     which_col <- lapply(itemNrs, function(itemNr) {
       c(itemNr, itemNr + nItem)
     })
@@ -172,11 +173,14 @@ get_bootstrapped_stats <- function(observed_resp, terms, meanCenter, decorrelate
   # progressBar <- txtProgressBar(min = 0, max = nSamples, style = 3, char = "|")
   # env <- environment()
 
-  sapply(seq_len(nSamples), get_one_bootstrapped_stat, simplify = "array",
-         observed_resp, terms, meanCenter, decorrelate,
-         impact_groups, index, which_col, type
-         #, env
-         )
+  bootstrapped_stats <- lapply(
+    seq_len(nSamples), get_one_bootstrapped_stat, observed_resp, terms,
+    meanCenter, decorrelate, impact_groups, index, which_col, type
+    #, env
+  )
+
+  array(unlist(bootstrapped_stats),
+        dim = c(dim(bootstrapped_stats[[1]]), nSamples))
 }
 
 

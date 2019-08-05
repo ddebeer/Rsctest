@@ -112,7 +112,7 @@ scale_scores <- function(scores, meanCenter = TRUE, decorrelate = TRUE,
 
     if(decorrelate){
       # Center scores
-      process[which, ] <- 'if'(meanCenter, scale(process[which, ], scale = FALSE), scores[which, ])
+      process[which, ] <- 'if'(meanCenter, scale(process[which, ], scale = FALSE), process[which, ])
 
       # missing response (NA) corresponds with zero (0) score contribution
       process[which, ][is.na(process[which, ])] <- 0

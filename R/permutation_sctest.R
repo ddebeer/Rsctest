@@ -132,8 +132,11 @@ of score contributions")
 # function to compute the bootstrapped statistics
 get_permuted_stats <- function(process, which_col, type, nSamples){
 
-  sapply(seq_len(nSamples), get_one_permuted_stat, simplify = "array",
-         process, which_col, type)
+  bootstrapped_stats <- lapply(
+    seq_len(nSamples), get_one_bootstrapped_stat, process, which_col, type)
+
+  array(unlist(bootstrapped_stats),
+        dim = c(dim(bootstrapped_stats[[1]]), nSamples))
 }
 
 
