@@ -21,6 +21,12 @@ get_scores <- function(resp, a, b, c, theta,
   nItem <- ncol(resp)
   nPerson <- nrow(resp)
 
+  # length of item parameter vectors should be correct
+  if(!all(sapply(list(a, b, c), length) == nItem))
+    stop("The vectors with the item parameters should be equal to the number ",
+         "of columns in 'resp'.")
+
+
   # compute terms for scores
   terms <- get_terms_for_scores(theta, a, b, c, slope_intercept)
 
@@ -105,34 +111,36 @@ scale_scores <- function(scores, meanCenter = TRUE, decorrelate = TRUE,
                          impact_groups = rep(1, dim(scores)[1])){
 
   # create return object
-  process <- scores
+  scaled_scores <- scores# / sqrt(dim(scores)[1])
 
   for(groupIndicator in unique(impact_groups)){
     which <- impact_groups == groupIndicator
 
     if(decorrelate){
       # Center scores
-      process[which, ] <- 'if'(meanCenter, scale(process[which, ], scale = FALSE), process[which, ])
+      scaled_scores[which, ] <- 'if'(meanCenter,
+                                     scale(scaled_scores[which, ], scale = FALSE),
+                                     scaled_scores[which, ])
 
       # missing response (NA) corresponds with zero (0) score contribution
-      process[which, ][is.na(process[which, ])] <- 0
+      scaled_scores[which, ][is.na(scaled_scores[which, ])] <- 0
 
-      # Decorelate process
+      # Decorelate scores
       sqrtInvI <- tryCatch(
-        chol2inv(chol(expm::sqrtm(crossprod(process[which, ])))),
-        error = stop("Decorrelating leads to numerical problems.
+        chol2inv(chol(expm::sqrtm(crossprod(scaled_scores[which, ])))),
+        error = function(e) stop("Decorrelating leads to numerical problems.
 Use 'decorrelate = FALSE' instead.",
                      call. = FALSE)
         )
-      process[which, ] <- (process[which, ] %*% sqrtInvI)
+      scaled_scores[which, ] <- (scaled_scores[which, ] %*% sqrtInvI)
     } else {
       # Center scores
-      process[which, ] <- scale(process[which, ], center = meanCenter)
+      scaled_scores[which, ] <- scale(scaled_scores[which, ], center = meanCenter)
       # missing response (NA) corresponds with zero (0) score contribution
-      process[which, ][is.na(process[which, ])] <- 0
+      scaled_scores[which, ][is.na(scaled_scores[which, ])] <- 0
     }
   }
 
-  return(process)
+  return(scaled_scores)
 }
 

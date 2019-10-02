@@ -1,7 +1,7 @@
 Package: Rsctest
 Type: Package
 Title: Resampling Score-Based Test for DIF-Detection
-Version: 0.1.0
+Version: 0.1.0-01
 Authors@R: c(
     person("Dries", "Debeer", email = "debeer.dries@gmail.com", 
     role = c("cre", "aut")),
@@ -16,6 +16,7 @@ Imports:
     expm,
     Matrix,
     PP
+Suggests: strucchange
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

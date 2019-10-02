@@ -6,11 +6,10 @@
 \usage{
 bootstrap_sctest(resp, theta = NULL, a = rep(1, length(b)), b,
   c = rep(0, length(b)), order_by = NULL, parameters = c("per_item",
-  "ab", "a", "b"), itemNrs = NULL, nSamples = 1000,
+  "ab", "a", "b"), item_selection = NULL, nSamples = 1000,
   theta_method = c("wle", "mle", "eap", "map"),
-  slope_intercept = FALSE, type = c("auto", "doubleMax", "meanL2",
-  "maxL2"), meanCenter = TRUE, decorrelate = FALSE,
-  impact_groups = rep(1, dim(resp)[1]))
+  slope_intercept = FALSE, statistic = "auto", meanCenter = TRUE,
+  decorrelate = FALSE, impact_groups = rep(1, dim(resp)[1]))
 }
 \arguments{
 \item{resp}{A matrix (or data frame) containing the responses, with the
@@ -31,9 +30,10 @@ element(s).}
 \item{parameters}{A charachter string, either "per_item", "ab", "a", or "b",
 to specify which parameters should be tested for.}
 
-\item{itemNrs}{An integer vector with the colum numbers in the \code{resp},
-specifying the items for which the test should be computed. Or NULL (the
-default), which leads to all the items being tested.}
+\item{item_selection}{A character vector with the colum names or an integer
+vector with the colum numbers in the \code{resp}, specifying the items for
+which the test should be computed. When set to NULL (i.t., the default),
+all the items are tested.}
 
 \item{nSamples}{An integer value with the number of permutations to be
 sampled.}
@@ -45,8 +45,8 @@ relevant when \code{theta == NULL}.}
 \item{slope_intercept}{A logical value indicating whether the slope-intercept
 formulation of the 2-/3-PL model should be used.}
 
-\item{type}{A charachter string, either "auto", "doubleMax", "meanL2",
-or "maxL2", specifying the test statistic to be used.}
+\item{statistic}{A charachter string, either "auto", "DM", "CvM",
+"maxLM", "LMuo", "WDMo", or "maxLMo", specifying the test statistic to be used.}
 
 \item{meanCenter}{A logical value: should the score contributions be mean
 centered per parameter?}
@@ -60,11 +60,11 @@ each person.}
 \value{
 a list with four elements:
 \describe{
-  \item{\code{test_stats}}{A matrix containing all the test statistics.}
+  \item{\code{statistics}}{A matrix containing all the test statistics.}
   \item{\code{p}}{A matrix containing the obtained \emph{p}-values.}
   \item{\code{nSamples}}{The number of samples taken.}
   \item{\code{order_by}}{A list containing all the covariate(s) used to order
-   the score contirbutions.}
+   the score contirbutions, as well as the used test statistics.}
 }
 }
 \description{

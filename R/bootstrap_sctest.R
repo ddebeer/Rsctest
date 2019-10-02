@@ -20,9 +20,10 @@
 #' element(s).
 #' @param parameters A charachter string, either "per_item", "ab", "a", or "b",
 #' to specify which parameters should be tested for.
-#' @param itemNrs An integer vector with the colum numbers in the \code{resp},
-#' specifying the items for which the test should be computed. Or NULL (the
-#' default), which leads to all the items being tested.
+#' @param item_selection A character vector with the colum names or an integer
+#' vector with the colum numbers in the \code{resp}, specifying the items for
+#' which the test should be computed. When set to NULL (i.t., the default),
+#' all the items are tested.
 #' @param nSamples An integer value with the number of permutations to be
 #' sampled.
 #' @param theta_method A charachter string, either "wle", "mle", "eap", of
@@ -30,8 +31,8 @@
 #' relevant when \code{theta == NULL}.
 #' @param slope_intercept A logical value indicating whether the slope-intercept
 #' formulation of the 2-/3-PL model should be used.
-#' @param type A charachter string, either "auto", "doubleMax", "meanL2",
-#' or "maxL2", specifying the test statistic to be used.
+#' @param statistic A charachter string, either "auto", "DM", "CvM",
+#' "maxLM", "LMuo", "WDMo", or "maxLMo", specifying the test statistic to be used.
 #' @param meanCenter A logical value: should the score contributions be mean
 #' centered per parameter?
 #' @param decorrelate A logical value: should the score contributions be
@@ -40,11 +41,11 @@
 #' each person.
 #' @return a list with four elements:
 #' \describe{
-#'   \item{\code{test_stats}}{A matrix containing all the test statistics.}
+#'   \item{\code{statistics}}{A matrix containing all the test statistics.}
 #'   \item{\code{p}}{A matrix containing the obtained \emph{p}-values.}
 #'   \item{\code{nSamples}}{The number of samples taken.}
 #'   \item{\code{order_by}}{A list containing all the covariate(s) used to order
-#'    the score contirbutions.}
+#'    the score contirbutions, as well as the used test statistics.}
 #' }
 #' @aliases bootstrap_sctest
 #' @seealso \code{\link{permutation_sctest}}
@@ -57,11 +58,11 @@ bootstrap_sctest <- function(resp,
                              c = rep(0, length(b)),
                              order_by = NULL,
                              parameters = c("per_item", "ab", "a", "b"),
-                             itemNrs = NULL,
+                             item_selection = NULL,
                              nSamples = 1000,
                              theta_method = c("wle", "mle", "eap", "map"),
                              slope_intercept = FALSE,
-                             type = c("auto", "doubleMax", "meanL2", "maxL2"),
+                             statistic = "auto",
                              meanCenter = TRUE,
                              decorrelate = FALSE,
                              impact_groups = rep(1, dim(resp)[1])){
@@ -71,92 +72,47 @@ bootstrap_sctest <- function(resp,
   stopifnot(is.matrix(resp) | is.data.frame(resp))
   if(is.data.frame(resp)) resp <- as.matrix(resp)
 
-  # number of items, number of persons
-  nItem <- ncol(resp)
+  # number of persons
   nPerson <- nrow(resp)
-
-  # length of item parameter vectors should be correct
-  if(!all(sapply(list(a, b, c), length) == nItem))
-    stop("The vector of item parameters should be equal to the number of items in the respons matrix")
 
   # retrieve theta (or estimate when theta == NULL)
   theta <- get_theta(resp, a, b, c, theta, theta_method, slope_intercept)
 
-  # match arguments
-  type <- match.arg(type)
-  parameters <- match.arg(parameters)
-
   # get list of which_col
-  # select the items
-  if(is.null(itemNrs)) itemNrs <- seq_len(nItem)
-  if(!all(itemNrs %in% seq_len(nItem))) stop("'itemNrs' does not correspond with the number of items in the response matrix.")
-
-  # select the parameters
-  if(parameters == "per_item"){
-
-    which_col <- lapply(itemNrs, function(itemNr) {
-      c(itemNr, itemNr + nItem)
-    })
-    names(which_col) <- paste0("item", itemNrs)
-    if(type == "auto") type <- "doubleMax"
-  } else {
-    which_col <- switch(parameters,
-                        "a" = itemNrs,
-                        "b" = itemNrs + nItem,
-                        "ab" = c(itemNrs, itemNrs + nItem))
-    names(which_col) <- switch(parameters,
-                               "a" = paste0("a_it", itemNrs),
-                               "b" = paste0("b_it", itemNrs),
-                               "ab" = c(paste0("a_it", itemNrs),
-                                        paste0("b_it", itemNrs)))
-
-    if(type == "auto") type <- "max"
-  }
-
-  # If no order variable is given create one
-  if(is.null(order_by)) order_by <- list(order1 = seq_len(nPerson))
-  if(length(order_by) == nPerson) order_by <- list(order1 = order_by)
-
-  # order_by should be a list with elements of length nPerson
-  stopifnot(is.list(order_by))
-  if(!all(sapply(order_by, function(x) length(x) == nPerson)))
-    stop("The length of the element(s) of order_by is not equal to the number
-of score contributions")
-
-  # give names to order_by
-  if(is.null(names(order_by)))
-    names(order_by) <- paste0("order", seq_along(order_by))
+  which_col <- get_which_col(item_selection, resp,
+                             parameters = match.arg(parameters))
 
   # create index- matrix according to the order_bys
-  index <- get_index(order_by, nPerson)
+  index_list <- get_index_list(order_by, nPerson, statistic)
 
   # get the scores, as well as the terms to compute the scores
   scores_terms <- get_scores(resp, a, b, c, theta,
                              slope_intercept, sparse = FALSE,
                              return_terms = TRUE)
 
-  # scale generated score contributions, so that they become brownian process
-  process <- scale_scores(scores_terms$scores, meanCenter, decorrelate, impact_groups)
+  # scale generated score contributions, rather than scaling the brownian process
+  scaled_scores <- scale_scores(scores_terms$scores, meanCenter, decorrelate,
+                                impact_groups)
 
   # compute the test statistic based on the observed scores
-  test_stats <- get_stats(process, index, which_col, type)
+  test_stats <- get_stats(scaled_scores, index_list, which_col)
 
   # get test statistic distribution based on
   bootstrapped_stats <- get_bootstrapped_stats(observed_resp = resp,
                                              terms = scores_terms$terms,
                                              meanCenter, decorrelate,
                                              impact_groups,
-                                             index, which_col, type,
+                                             index_list, which_col,
                                              nSamples)
 
   # compute the p-values
   p <- get_pvalues(test_stats, bootstrapped_stats)
 
 
-  return(list(test_stats = test_stats,
+  return(list(statistic = test_stats,
               p = p,
               nSamples = nSamples,
-              order_by = order_by,
+              order_by = index_list,
               theta = theta))
 
 
@@ -165,7 +121,7 @@ of score contributions")
 
 # function to compute the bootstrapped statistics
 get_bootstrapped_stats <- function(observed_resp, terms, meanCenter, decorrelate,
-                                  impact_groups, index, which_col, type,
+                                  impact_groups, index_list, which_col,
                                   nSamples = 1000
                                   ){
 
@@ -175,7 +131,7 @@ get_bootstrapped_stats <- function(observed_resp, terms, meanCenter, decorrelate
 
   bootstrapped_stats <- lapply(
     seq_len(nSamples), get_one_bootstrapped_stat, observed_resp, terms,
-    meanCenter, decorrelate, impact_groups, index, which_col, type
+    meanCenter, decorrelate, impact_groups, index_list, which_col
     #, env
   )
 
@@ -186,7 +142,7 @@ get_bootstrapped_stats <- function(observed_resp, terms, meanCenter, decorrelate
 
 # function to compute one bootstrapped statistic
 get_one_bootstrapped_stat <- function(sampleNr, observed_resp, terms, meanCenter, decorrelate,
-                                      impact_groups, index, which_col, type
+                                      impact_groups, index_list, which_col
                                       #, env
                                       ){
 
@@ -198,10 +154,10 @@ get_one_bootstrapped_stat <- function(sampleNr, observed_resp, terms, meanCenter
   gen_scores <- get_scores_from_terms(gen_resp, terms)
 
   # scale generated score contributions, so that they become brownian process
-  process <- scale_scores(gen_scores, meanCenter, decorrelate, impact_groups)
+  scaled_gen_scores <- scale_scores(gen_scores, meanCenter, decorrelate, impact_groups)
 
   # compute statistics
-  stats <- get_stats(process, index, which_col, type)
+  stats <- get_stats(scaled_gen_scores, index_list, which_col)
 
   return(stats)
 }
