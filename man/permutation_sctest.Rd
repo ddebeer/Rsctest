@@ -4,12 +4,23 @@
 \alias{permutation_sctest}
 \title{A score-based DIF test using the permutation approach.}
 \usage{
-permutation_sctest(resp, theta = NULL, a = rep(1, length(b)), b,
-  c = rep(0, length(b)), order_by = NULL, parameters = c("per_item",
-  "ab", "a", "b"), item_selection = NULL, nSamples = 1000,
+permutation_sctest(
+  resp,
+  theta = NULL,
+  a = rep(1, length(b)),
+  b,
+  c = rep(0, length(b)),
+  DIF_covariate = NULL,
+  parameters = c("per_item", "ab", "a", "b"),
+  item_selection = NULL,
+  nSamples = 1000,
   theta_method = c("wle", "mle", "eap", "map"),
-  slope_intercept = FALSE, statistic = "auto", meanCenter = TRUE,
-  decorrelate = FALSE, impact_groups = rep(1, dim(resp)[1]))
+  slope_intercept = FALSE,
+  statistic = "auto",
+  meanCenter = TRUE,
+  decorrelate = FALSE,
+  impact_groups = rep(1, dim(resp)[1])
+)
 }
 \arguments{
 \item{resp}{A matrix (or data frame) containing the responses, with the
@@ -24,7 +35,7 @@ items in the columns.}
 
 \item{c}{A vector of pseudo guessing parameters.}
 
-\item{order_by}{A list with the person covariate(s) to test for as
+\item{DIF_covariate}{A list with the person covariate(s) to test for as
 element(s).}
 
 \item{parameters}{A charachter string, either "per_item", "ab", "a", or "b",
@@ -63,13 +74,13 @@ a list with four elements:
   \item{\code{statistics}}{A matrix containing all the test statistics.}
   \item{\code{p}}{A matrix containing the obtained \emph{p}-values.}
   \item{\code{nSamples}}{The number of samples taken.}
-  \item{\code{order_by}}{A list containing all the covariate(s) used to order
+  \item{\code{DIF_covariate}}{A list containing all the covariate(s) used to order
    the score contirbutions, as well as the used test statistics.}
 }
 }
 \description{
 \code{permutation_sctest} computes score test to detect DIF in multiple
-item/parameters with respect to multiple person covariates (\code{order_by}).
+item/parameters with respect to multiple person covariates (\code{DIF_covariate}).
 To obtain the p-values a resampling approach is applied. That is, person
 orders are randomly permuted to sample from the test statistic distribution
 under the null hypothesis. The

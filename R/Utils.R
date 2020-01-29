@@ -4,6 +4,9 @@
 
 # Function to compute the list with columnnumbers for the score tests
 get_which_col <- function(item_selection, resp, parameters){
+  
+  # get number of items
+  nItem <- dim(resp)[2]
 
   # Collect the column names
   colnames(resp) <- itemNames <- 'if'(is.null(colnames(resp)),
@@ -12,7 +15,7 @@ get_which_col <- function(item_selection, resp, parameters){
                                               seq_len(nItem)),
                                       colnames(resp))
 
-  nItem <- length(itemNames)
+
 
   # select the items
   itemNrs <-
