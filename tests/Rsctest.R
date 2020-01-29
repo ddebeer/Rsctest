@@ -60,7 +60,7 @@ stopifnot(all((gefp$process[-1,] - process) < 1e-14))
 # bootstrap vs sctest
 test_b <- bootstrap_sctest(resp = resp, a = a, b = b, nSample = 15,
                          item_selection = 1,
-                         order_by = list(m1 = metric,
+                         DIF_covariate = list(m1 = metric,
                                          m2 = metric,
                                          m3 = metric,
                                          f = factor,
@@ -99,7 +99,7 @@ stopifnot(all(test_b$statistic / rbind(sctest_m1$statistic,
 # permutation vs bootstrap
 test_p <- permutation_sctest(resp = resp, a = a, b = b, nSample = 15,
                              item_selection = 1,
-                             order_by = list(m1 = metric,
+                             DIF_covariate = list(m1 = metric,
                                              m2 = metric,
                                              m3 = metric,
                                              f = factor,

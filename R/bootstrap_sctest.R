@@ -1,7 +1,7 @@
 #' A score-based DIF test using the parameteric bootstrap approach.
 #'
 #' \code{bootstrap_sctest} computes score test to detect DIF in multiple
-#' item/parameters with respect to multiple person covariates (\code{order_by}).
+#' item/parameters with respect to multiple person covariates (\code{DIF_covariate}).
 #' To obtain the p-values a resampling approach is applied. That is, given the
 #' (item and person) parameters, new data sets are sampled to create the
 #' distribution of the test statistic under the null-hypothesis. The
@@ -16,7 +16,7 @@
 #' @param c A vector of pseudo guessing parameters.
 #' @param theta A vector with the true/estimated ability parameters or NULL
 #' (the default) which leads to the ability parameters being estimated.
-#' @param order_by A list with the person covariate(s) to test for as
+#' @param DIF_covariate A list with the person covariate(s) to test for as
 #' element(s).
 #' @param parameters A charachter string, either "per_item", "ab", "a", or "b",
 #' to specify which parameters should be tested for.
@@ -44,7 +44,7 @@
 #'   \item{\code{statistics}}{A matrix containing all the test statistics.}
 #'   \item{\code{p}}{A matrix containing the obtained \emph{p}-values.}
 #'   \item{\code{nSamples}}{The number of samples taken.}
-#'   \item{\code{order_by}}{A list containing all the covariate(s) used to order
+#'   \item{\code{DIF_covariate}}{A list containing all the covariate(s) used to order
 #'    the score contirbutions, as well as the used test statistics.}
 #' }
 #' @aliases bootstrap_sctest
@@ -56,7 +56,7 @@ bootstrap_sctest <- function(resp,
                              a = rep(1, length(b)),
                              b,
                              c = rep(0, length(b)),
-                             order_by = NULL,
+                             DIF_covariate = NULL,
                              parameters = c("per_item", "ab", "a", "b"),
                              item_selection = NULL,
                              nSamples = 1000,
@@ -68,6 +68,9 @@ bootstrap_sctest <- function(resp,
                              impact_groups = rep(1, dim(resp)[1])){
 
 
+  # get call
+  call <- match.call()
+  
   # The responses should be in a matrix
   stopifnot(is.matrix(resp) | is.data.frame(resp))
   if(is.data.frame(resp)) resp <- as.matrix(resp)
@@ -82,8 +85,8 @@ bootstrap_sctest <- function(resp,
   which_col <- get_which_col(item_selection, resp,
                              parameters = match.arg(parameters))
 
-  # create index- matrix according to the order_bys
-  index_list <- get_index_list(order_by, nPerson, statistic)
+  # create index- matrix according to the DIF_covariates
+  index_list <- get_index_list(DIF_covariate, nPerson, statistic, call)
 
   # get the scores, as well as the terms to compute the scores
   scores_terms <- get_scores(resp, a, b, c, theta,
@@ -109,10 +112,11 @@ bootstrap_sctest <- function(resp,
   p <- get_pvalues(test_stats, bootstrapped_stats)
 
 
-  return(list(statistic = test_stats,
+  return(list(resp = resp, 
+              statistic = test_stats,
               p = p,
               nSamples = nSamples,
-              order_by = index_list,
+              DIF_covariate = index_list,
               theta = theta))
 
 

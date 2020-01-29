@@ -6,9 +6,11 @@
 get_which_col <- function(item_selection, resp, parameters){
 
   # Collect the column names
-  itemNames <- 'if'(is.null(colnames(resp)),
-                    paste0("item", seq_len(dim(resp)[2])),
-                    colnames(resp))
+  colnames(resp) <- itemNames <- 'if'(is.null(colnames(resp)),
+                                      sprintf(paste("it%0", nchar(nItem),
+                                                    "d", sep=''),
+                                              seq_len(nItem)),
+                                      colnames(resp))
 
   nItem <- length(itemNames)
 
